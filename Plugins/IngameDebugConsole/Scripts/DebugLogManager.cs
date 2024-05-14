@@ -170,6 +170,13 @@ namespace IngameDebugConsole
 		private int commandHistorySize = 15;
 
 		[SerializeField]
+		/// <summary>
+		/// Whether to save the command history to the filesystem
+		/// </summary>
+		[Tooltip("Whether to save the command history to the filesystem")]
+		private bool saveCommandHistory = true;
+
+		[SerializeField]
 		[HideInInspector]
 		[Tooltip( "If enabled, while typing a command, all of the matching commands' signatures will be displayed in a popup" )]
 		private bool showCommandSuggestions = true;
@@ -179,294 +186,298 @@ namespace IngameDebugConsole
 		[Tooltip( "If enabled, on Android platform, logcat entries of the application will also be logged to the console with the prefix \"LOGCAT: \". This may come in handy especially if you want to access the native logs of your Android plugins (like Admob)" )]
 		private bool receiveLogcatLogsInAndroid = false;
 
-#pragma warning disable 0414
-#if UNITY_2018_3_OR_NEWER // On older Unity versions, disabling CS0169 is problematic: "Cannot restore warning 'CS0169' because it was disabled globally"
-#pragma warning disable 0169
-#endif
-		[SerializeField]
-		[HideInInspector]
-		[Tooltip( "Native logs will be filtered using these arguments. If left blank, all native logs of the application will be logged to the console. But if you want to e.g. see Admob's logs only, you can enter \"-s Ads\" (without quotes) here" )]
-		private string logcatArguments;
-#if UNITY_2018_3_OR_NEWER
-#pragma warning restore 0169
-#endif
-#pragma warning restore 0414
+	#pragma warning disable 0414
+	#if UNITY_2018_3_OR_NEWER // On older Unity versions, disabling CS0169 is problematic: "Cannot restore warning 'CS0169' because it was disabled globally"
+	#pragma warning disable 0169
+	#endif
+			[SerializeField]
+			[HideInInspector]
+			[Tooltip( "Native logs will be filtered using these arguments. If left blank, all native logs of the application will be logged to the console. But if you want to e.g. see Admob's logs only, you can enter \"-s Ads\" (without quotes) here" )]
+			private string logcatArguments;
+	#if UNITY_2018_3_OR_NEWER
+	#pragma warning restore 0169
+	#endif
+	#pragma warning restore 0414
 
-		[SerializeField]
-		[HideInInspector]
-		[Tooltip( "If enabled, on Android and iOS devices with notch screens, the console window will be repositioned so that the cutout(s) don't obscure it" )]
-		private bool avoidScreenCutout = true;
+			[SerializeField]
+			[HideInInspector]
+			[Tooltip( "If enabled, on Android and iOS devices with notch screens, the console window will be repositioned so that the cutout(s) don't obscure it" )]
+			private bool avoidScreenCutout = true;
 
-		[SerializeField]
-		[HideInInspector]
-		[Tooltip( "If enabled, on Android and iOS devices with notch screens, the console window's popup won't be obscured by the screen cutouts" )]
-		internal bool popupAvoidsScreenCutout = false;
+			[SerializeField]
+			[HideInInspector]
+			[Tooltip( "If enabled, on Android and iOS devices with notch screens, the console window's popup won't be obscured by the screen cutouts" )]
+			internal bool popupAvoidsScreenCutout = false;
 
-		[SerializeField]
-		[Tooltip( "If a log is longer than this limit, it will be truncated. This helps avoid reaching Unity's 65000 vertex limit for UI canvases" )]
-		private int maxLogLength = 10000;
+			[SerializeField]
+			[Tooltip( "If a log is longer than this limit, it will be truncated. This helps avoid reaching Unity's 65000 vertex limit for UI canvases" )]
+			private int maxLogLength = 10000;
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
-		[SerializeField]
-		[HideInInspector]
-		[Tooltip( "If enabled, on standalone platforms, command input field will automatically be focused (start receiving keyboard input) after opening the console window" )]
-		private bool autoFocusOnCommandInputField = true;
-#endif
+	#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
+			[SerializeField]
+			[HideInInspector]
+			[Tooltip( "If enabled, on standalone platforms, command input field will automatically be focused (start receiving keyboard input) after opening the console window" )]
+			private bool autoFocusOnCommandInputField = true;
+	#endif
 
-		[Header( "Visuals" )]
-		[SerializeField]
-		private DebugLogItem logItemPrefab;
+			[Header( "Visuals" )]
+			[SerializeField]
+			private DebugLogItem logItemPrefab;
 
-		[SerializeField]
-		private Text commandSuggestionPrefab;
+			[SerializeField]
+			private Text commandSuggestionPrefab;
 
-		// Visuals for different log types
-		[SerializeField]
-		private Sprite infoLog;
-		[SerializeField]
-		private Sprite warningLog;
-		[SerializeField]
-		private Sprite errorLog;
+			// Visuals for different log types
+			[SerializeField]
+			private Sprite infoLog;
+			[SerializeField]
+			private Sprite warningLog;
+			[SerializeField]
+			private Sprite errorLog;
 
-		private Sprite[] logSpriteRepresentations;
+			private Sprite[] logSpriteRepresentations;
 
-		// Visuals for resize button
-		[SerializeField]
-		private Sprite resizeIconAllDirections;
-		[SerializeField]
-		private Sprite resizeIconVerticalOnly;
+			// Visuals for resize button
+			[SerializeField]
+			private Sprite resizeIconAllDirections;
+			[SerializeField]
+			private Sprite resizeIconVerticalOnly;
 
-		[SerializeField]
-		private Color collapseButtonNormalColor;
-		[SerializeField]
-		private Color collapseButtonSelectedColor;
+			[SerializeField]
+			private Color collapseButtonNormalColor;
+			[SerializeField]
+			private Color collapseButtonSelectedColor;
 
-		[SerializeField]
-		private Color filterButtonsNormalColor;
-		[SerializeField]
-		private Color filterButtonsSelectedColor;
+			[SerializeField]
+			private Color filterButtonsNormalColor;
+			[SerializeField]
+			private Color filterButtonsSelectedColor;
 
-		[SerializeField]
-		private string commandSuggestionHighlightStart = "<color=orange>";
-		[SerializeField]
-		private string commandSuggestionHighlightEnd = "</color>";
+			[SerializeField]
+			private string commandSuggestionHighlightStart = "<color=orange>";
+			[SerializeField]
+			private string commandSuggestionHighlightEnd = "</color>";
 
-		[Header( "Internal References" )]
-		[SerializeField]
-		private RectTransform logWindowTR;
+			[Header( "Internal References" )]
+			[SerializeField]
+			private RectTransform logWindowTR;
 
-		internal RectTransform canvasTR;
+			internal RectTransform canvasTR;
 
-		[SerializeField]
-		private RectTransform logItemsContainer;
+			[SerializeField]
+			private RectTransform logItemsContainer;
 
-		[SerializeField]
-		private RectTransform commandSuggestionsContainer;
+			[SerializeField]
+			private RectTransform commandSuggestionsContainer;
 
-		[SerializeField]
-		private InputField commandInputField;
+			[SerializeField]
+			private InputField commandInputField;
 
-		[SerializeField]
-		private Button hideButton;
+			[SerializeField]
+			private Button hideButton;
 
-		[SerializeField]
-		private Button clearButton;
+			[SerializeField]
+			private Button clearButton;
 
-		[SerializeField]
-		private Image collapseButton;
+			[SerializeField]
+			private Image collapseButton;
 
-		[SerializeField]
-		private Image filterInfoButton;
-		[SerializeField]
-		private Image filterWarningButton;
-		[SerializeField]
-		private Image filterErrorButton;
+			[SerializeField]
+			private Image filterInfoButton;
+			[SerializeField]
+			private Image filterWarningButton;
+			[SerializeField]
+			private Image filterErrorButton;
 
-		[SerializeField]
-		private Text infoEntryCountText;
-		[SerializeField]
-		private Text warningEntryCountText;
-		[SerializeField]
-		private Text errorEntryCountText;
+			[SerializeField]
+			private Text infoEntryCountText;
+			[SerializeField]
+			private Text warningEntryCountText;
+			[SerializeField]
+			private Text errorEntryCountText;
 
-		[SerializeField]
-		private RectTransform searchbar;
-		[SerializeField]
-		private RectTransform searchbarSlotTop;
-		[SerializeField]
-		private RectTransform searchbarSlotBottom;
+			[SerializeField]
+			private RectTransform searchbar;
+			[SerializeField]
+			private RectTransform searchbarSlotTop;
+			[SerializeField]
+			private RectTransform searchbarSlotBottom;
 
-		[SerializeField]
-		private Image resizeButton;
+			[SerializeField]
+			private Image resizeButton;
 
-		[SerializeField]
-		private GameObject snapToBottomButton;
+			[SerializeField]
+			private GameObject snapToBottomButton;
 
-		// Canvas group to modify visibility of the log window
-		[SerializeField]
-		private CanvasGroup logWindowCanvasGroup;
+			// Canvas group to modify visibility of the log window
+			[SerializeField]
+			private CanvasGroup logWindowCanvasGroup;
 
-		[SerializeField]
-		private DebugLogPopup popupManager;
+			[SerializeField]
+			private DebugLogPopup popupManager;
 
-		[SerializeField]
-		private ScrollRect logItemsScrollRect;
-		private RectTransform logItemsScrollRectTR;
-		private Vector2 logItemsScrollRectOriginalSize;
+			[SerializeField]
+			private ScrollRect logItemsScrollRect;
+			private RectTransform logItemsScrollRectTR;
+			private Vector2 logItemsScrollRectOriginalSize;
 
-		// Recycled list view to handle the log items efficiently
-		[SerializeField]
-		private DebugLogRecycledListView recycledListView;
-#pragma warning restore 0649
+			// Recycled list view to handle the log items efficiently
+			[SerializeField]
+			private DebugLogRecycledListView recycledListView;
+	#pragma warning restore 0649
 
-		private bool isLogWindowVisible = true;
-		public bool IsLogWindowVisible { get { return isLogWindowVisible; } }
+			private bool isLogWindowVisible = true;
+			public bool IsLogWindowVisible { get { return isLogWindowVisible; } }
 
-		public bool PopupEnabled
-		{
-			get { return popupManager.gameObject.activeSelf; }
-			set { popupManager.gameObject.SetActive( value ); }
-		}
-
-		private bool screenDimensionsChanged = true;
-		private float logWindowPreviousWidth;
-
-		// Number of entries filtered by their types
-		private int infoEntryCount = 0, warningEntryCount = 0, errorEntryCount = 0;
-		private bool entryCountTextsDirty;
-
-		// Number of new entries received this frame
-		private int newInfoEntryCount = 0, newWarningEntryCount = 0, newErrorEntryCount = 0;
-
-		// Filters to apply to the list of debug entries to show
-		private bool isCollapseOn = false;
-		private DebugLogFilter logFilter = DebugLogFilter.All;
-
-		// Search filter
-		private string searchTerm;
-		private bool isInSearchMode;
-
-		// If the last log item is completely visible (scrollbar is at the bottom),
-		// scrollbar will remain at the bottom when new debug entries are received
-		[System.NonSerialized]
-		public bool SnapToBottom = true;
-
-		// List of unique debug entries (duplicates of entries are not kept)
-		private DynamicCircularBuffer<DebugLogEntry> collapsedLogEntries;
-		private DynamicCircularBuffer<DebugLogEntryTimestamp> collapsedLogEntriesTimestamps;
-
-		// Dictionary to quickly find if a log already exists in collapsedLogEntries
-		private Dictionary<DebugLogEntry, DebugLogEntry> collapsedLogEntriesMap;
-
-		// The order the collapsedLogEntries are received 
-		// (duplicate entries have the same value)
-		private DynamicCircularBuffer<DebugLogEntry> uncollapsedLogEntries;
-		private DynamicCircularBuffer<DebugLogEntryTimestamp> uncollapsedLogEntriesTimestamps;
-
-		// Filtered list of debug entries to show
-		private DynamicCircularBuffer<DebugLogEntry> logEntriesToShow;
-		private DynamicCircularBuffer<DebugLogEntryTimestamp> timestampsOfLogEntriesToShow;
-
-		// The log entry that must be focused this frame
-		private int indexOfLogEntryToSelectAndFocus = -1;
-
-		// Whether or not logs list view should be updated this frame
-		private bool shouldUpdateRecycledListView = true;
-
-		// Logs that should be registered in Update-loop
-		private DynamicCircularBuffer<QueuedDebugLogEntry> queuedLogEntries;
-		private DynamicCircularBuffer<DebugLogEntryTimestamp> queuedLogEntriesTimestamps;
-		private object logEntriesLock;
-		private int pendingLogToAutoExpand;
-
-		// Command suggestions that match the currently entered command
-		private List<Text> commandSuggestionInstances;
-		private int visibleCommandSuggestionInstances = 0;
-		private List<ConsoleMethodInfo> matchingCommandSuggestions;
-		private List<int> commandCaretIndexIncrements;
-		private string commandInputFieldPrevCommand;
-		private string commandInputFieldPrevCommandName;
-		private int commandInputFieldPrevParamCount = -1;
-		private int commandInputFieldPrevCaretPos = -1;
-		private int commandInputFieldPrevCaretArgumentIndex = -1;
-
-		// Value of the command input field when autocomplete was first requested
-		private string commandInputFieldAutoCompleteBase;
-		private bool commandInputFieldAutoCompletedNow;
-
-		// Pools for memory efficiency
-		private Stack<DebugLogEntry> pooledLogEntries;
-		private Stack<DebugLogItem> pooledLogItems;
-
-		/// Variables used by <see cref="RemoveOldestLogs"/>
-		private bool anyCollapsedLogRemoved;
-		private int removedLogEntriesToShowCount;
-
-		// History of the previously entered commands
-		private CircularBuffer<string> commandHistory;
-		private int commandHistoryIndex = -1;
-		private string unfinishedCommand;
-
-		// StringBuilder used by various functions
-		internal StringBuilder sharedStringBuilder;
-
-		// Offset of DateTime.Now from DateTime.UtcNow
-		private System.TimeSpan localTimeUtcOffset;
-
-		// Last recorded values of Time.realtimeSinceStartup and Time.frameCount on the main thread (because these Time properties can't be accessed from other threads)
-#if !IDG_OMIT_ELAPSED_TIME
-		private float lastElapsedSeconds;
-#endif
-#if !IDG_OMIT_FRAMECOUNT
-		private int lastFrameCount;
-#endif
-
-		private DebugLogEntryTimestamp dummyLogEntryTimestamp;
-
-		// Required in ValidateScrollPosition() function
-		private PointerEventData nullPointerEventData;
-
-		private System.Action<DebugLogEntry> poolLogEntryAction;
-		private System.Action<DebugLogEntry> removeUncollapsedLogEntryAction;
-		private System.Predicate<DebugLogEntry> shouldRemoveCollapsedLogEntryPredicate;
-		private System.Predicate<DebugLogEntry> shouldRemoveLogEntryToShowPredicate;
-		private System.Action<DebugLogEntry, int> updateLogEntryCollapsedIndexAction;
-
-		// Callbacks for log window show/hide events
-		public System.Action OnLogWindowShown, OnLogWindowHidden;
-
-#if UNITY_EDITOR
-		private bool isQuittingApplication;
-#endif
-
-#if !UNITY_EDITOR && UNITY_ANDROID
-		private DebugLogLogcatListener logcatListener;
-#endif
-
-		private void Awake()
-		{
-			// Only one instance of debug console is allowed
-			if( !Instance )
+			public bool PopupEnabled
 			{
-				Instance = this;
-
-				// If it is a singleton object, don't destroy it between scene changes
-				if( singleton )
-					DontDestroyOnLoad( gameObject );
-			}
-			else if( Instance != this )
-			{
-				Destroy( gameObject );
-				return;
+				get { return popupManager.gameObject.activeSelf; }
+				set { popupManager.gameObject.SetActive( value ); }
 			}
 
-			pooledLogEntries = new Stack<DebugLogEntry>( 64 );
-			pooledLogItems = new Stack<DebugLogItem>( 16 );
-			commandSuggestionInstances = new List<Text>( 8 );
-			matchingCommandSuggestions = new List<ConsoleMethodInfo>( 8 );
-			commandCaretIndexIncrements = new List<int>( 8 );
-			queuedLogEntries = new DynamicCircularBuffer<QueuedDebugLogEntry>( Mathf.Clamp( queuedLogLimit, 16, 4096 ) );
-			commandHistory = new CircularBuffer<string>( commandHistorySize );
+			private bool screenDimensionsChanged = true;
+			private float logWindowPreviousWidth;
+
+			// Number of entries filtered by their types
+			private int infoEntryCount = 0, warningEntryCount = 0, errorEntryCount = 0;
+			private bool entryCountTextsDirty;
+
+			// Number of new entries received this frame
+			private int newInfoEntryCount = 0, newWarningEntryCount = 0, newErrorEntryCount = 0;
+
+			// Filters to apply to the list of debug entries to show
+			private bool isCollapseOn = false;
+			private DebugLogFilter logFilter = DebugLogFilter.All;
+
+			// Search filter
+			private string searchTerm;
+			private bool isInSearchMode;
+
+			// If the last log item is completely visible (scrollbar is at the bottom),
+			// scrollbar will remain at the bottom when new debug entries are received
+			[System.NonSerialized]
+			public bool SnapToBottom = true;
+
+			// List of unique debug entries (duplicates of entries are not kept)
+			private DynamicCircularBuffer<DebugLogEntry> collapsedLogEntries;
+			private DynamicCircularBuffer<DebugLogEntryTimestamp> collapsedLogEntriesTimestamps;
+
+			// Dictionary to quickly find if a log already exists in collapsedLogEntries
+			private Dictionary<DebugLogEntry, DebugLogEntry> collapsedLogEntriesMap;
+
+			// The order the collapsedLogEntries are received
+			// (duplicate entries have the same value)
+			private DynamicCircularBuffer<DebugLogEntry> uncollapsedLogEntries;
+			private DynamicCircularBuffer<DebugLogEntryTimestamp> uncollapsedLogEntriesTimestamps;
+
+			// Filtered list of debug entries to show
+			private DynamicCircularBuffer<DebugLogEntry> logEntriesToShow;
+			private DynamicCircularBuffer<DebugLogEntryTimestamp> timestampsOfLogEntriesToShow;
+
+			// The log entry that must be focused this frame
+			private int indexOfLogEntryToSelectAndFocus = -1;
+
+			// Whether or not logs list view should be updated this frame
+			private bool shouldUpdateRecycledListView = true;
+
+			// Logs that should be registered in Update-loop
+			private DynamicCircularBuffer<QueuedDebugLogEntry> queuedLogEntries;
+			private DynamicCircularBuffer<DebugLogEntryTimestamp> queuedLogEntriesTimestamps;
+			private object logEntriesLock;
+			private int pendingLogToAutoExpand;
+
+			// Command suggestions that match the currently entered command
+			private List<Text> commandSuggestionInstances;
+			private int visibleCommandSuggestionInstances = 0;
+			private List<ConsoleMethodInfo> matchingCommandSuggestions;
+			private List<int> commandCaretIndexIncrements;
+			private string commandInputFieldPrevCommand;
+			private string commandInputFieldPrevCommandName;
+			private int commandInputFieldPrevParamCount = -1;
+			private int commandInputFieldPrevCaretPos = -1;
+			private int commandInputFieldPrevCaretArgumentIndex = -1;
+
+			// Value of the command input field when autocomplete was first requested
+			private string commandInputFieldAutoCompleteBase;
+			private bool commandInputFieldAutoCompletedNow;
+
+			// Pools for memory efficiency
+			private Stack<DebugLogEntry> pooledLogEntries;
+			private Stack<DebugLogItem> pooledLogItems;
+
+			/// Variables used by <see cref="RemoveOldestLogs"/>
+			private bool anyCollapsedLogRemoved;
+			private int removedLogEntriesToShowCount;
+
+			// History of the previously entered commands
+			private CircularBuffer<string> commandHistory;
+			private int commandHistoryIndex = -1;
+			private string unfinishedCommand;
+
+			// StringBuilder used by various functions
+			internal StringBuilder sharedStringBuilder;
+
+			// Offset of DateTime.Now from DateTime.UtcNow
+			private System.TimeSpan localTimeUtcOffset;
+
+			// Last recorded values of Time.realtimeSinceStartup and Time.frameCount on the main thread (because these Time properties can't be accessed from other threads)
+	#if !IDG_OMIT_ELAPSED_TIME
+			private float lastElapsedSeconds;
+	#endif
+	#if !IDG_OMIT_FRAMECOUNT
+			private int lastFrameCount;
+	#endif
+
+			private DebugLogEntryTimestamp dummyLogEntryTimestamp;
+
+			// Required in ValidateScrollPosition() function
+			private PointerEventData nullPointerEventData;
+
+			private System.Action<DebugLogEntry> poolLogEntryAction;
+			private System.Action<DebugLogEntry> removeUncollapsedLogEntryAction;
+			private System.Predicate<DebugLogEntry> shouldRemoveCollapsedLogEntryPredicate;
+			private System.Predicate<DebugLogEntry> shouldRemoveLogEntryToShowPredicate;
+			private System.Action<DebugLogEntry, int> updateLogEntryCollapsedIndexAction;
+
+			// Callbacks for log window show/hide events
+			public System.Action OnLogWindowShown, OnLogWindowHidden;
+
+	#if UNITY_EDITOR
+			private bool isQuittingApplication;
+	#endif
+
+	#if !UNITY_EDITOR && UNITY_ANDROID
+			private DebugLogLogcatListener logcatListener;
+	#endif
+
+			private static string commandHistoryPath => Path.Combine(Application.persistentDataPath, "consolehistory.txt");
+
+			private void Awake()
+			{
+				// Only one instance of debug console is allowed
+				if( !Instance )
+				{
+					Instance = this;
+
+					// If it is a singleton object, don't destroy it between scene changes
+					if( singleton )
+						DontDestroyOnLoad( gameObject );
+				}
+				else if( Instance != this )
+				{
+					Destroy( gameObject );
+					return;
+				}
+
+				pooledLogEntries = new Stack<DebugLogEntry>( 64 );
+				pooledLogItems = new Stack<DebugLogItem>( 16 );
+				commandSuggestionInstances = new List<Text>( 8 );
+				matchingCommandSuggestions = new List<ConsoleMethodInfo>( 8 );
+				commandCaretIndexIncrements = new List<int>( 8 );
+				queuedLogEntries = new DynamicCircularBuffer<QueuedDebugLogEntry>( Mathf.Clamp( queuedLogLimit, 16, 4096 ) );
+				commandHistory = new CircularBuffer<string>( commandHistorySize );
+
+			if (saveCommandHistory) LoadCommandHistory();
 
 			logEntriesLock = new object();
 			sharedStringBuilder = new StringBuilder( 1024 );
@@ -694,6 +705,7 @@ namespace IngameDebugConsole
 #endif
 		{
 			isQuittingApplication = true;
+			if (saveCommandHistory) SaveCommandHistory();
 		}
 #endif
 
@@ -1872,6 +1884,27 @@ namespace IngameDebugConsole
 			}
 
 			return newLogItem;
+		}
+
+		private void LoadCommandHistory()
+		{
+			if (!File.Exists(commandHistoryPath)) return;
+			var text = File.ReadAllLines(commandHistoryPath);
+			foreach (var command in text)
+			{
+				commandHistory.Add(command);
+			}
+		}
+
+		private void SaveCommandHistory()
+		{
+			var stringBuilder = new StringBuilder();
+			for (int i = 0; i < commandHistory.Count; i++)
+			{
+				stringBuilder.AppendLine(commandHistory[i]);
+			}
+
+			File.WriteAllText(commandHistoryPath, stringBuilder.ToString());
 		}
 	}
 }
