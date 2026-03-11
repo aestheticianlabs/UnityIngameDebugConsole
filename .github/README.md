@@ -1,6 +1,10 @@
+> [!NOTE] 
+> This fork of [yasirkula/UnityIngameDebugConsole](TODO) saves the command history so that it is persistent between sessions. Unfortunately, the maintainer of the original repo [is not interested in this feature](https://github.com/yasirkula/UnityIngameDebugConsole/pull/96#issuecomment-2282223329). Below is the original repo's README.
+
 # In-game Debug Console for Unity 3D
 
 <img height="235" src="Images/1.png" alt="screenshot" /> <img height="235" src="Images/2.png" alt="screenshot2" />
+
 
 **Available on Asset Store:** https://assetstore.unity.com/packages/tools/gui/in-game-debug-console-68068
 
