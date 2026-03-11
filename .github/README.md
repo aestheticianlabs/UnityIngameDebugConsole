@@ -27,8 +27,8 @@ There are 5 ways to install this plugin:
 - import [IngameDebugConsole.unitypackage](https://github.com/yasirkula/UnityIngameDebugConsole/releases) via *Assets-Import Package*
 - clone/[download](https://github.com/yasirkula/UnityIngameDebugConsole/archive/master.zip) this repository and move the *Plugins* folder to your Unity project's *Assets* folder
 - import it from [Asset Store](https://assetstore.unity.com/packages/tools/gui/in-game-debug-console-68068)
-- *(via Package Manager)* add the following line to *Packages/manifest.json*:
-  - `"com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git",`
+- *(via Package Manager)* click the + button and install the package from the following git URL:
+  - `https://github.com/yasirkula/UnityIngameDebugConsole.git`
 - *(via [OpenUPM](https://openupm.com))* after installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
   - `openupm add com.yasirkula.ingamedebugconsole`
 
@@ -196,6 +196,8 @@ Use `DebugLogConsole.RemoveCommand( string command )` or one of the `DebugLogCon
 
 ### Extending Supported Parameter Types
 
+- **Strongly Typed Functions**
+
 Use `DebugLogConsole.AddCustomParameterType( Type type, ParseFunction parseFunction, string typeReadableName = null )`:
 
 ```csharp
@@ -251,4 +253,24 @@ public class TestScript : MonoBehaviour
 }
 ```
 
-To remove the custom parameter type, you can use `DebugLogConsole.RemoveCustomParameterType( Type type )`.
+- **ConsoleCustomTypeParser Attribute**
+
+Simply add **IngameDebugConsole.ConsoleCustomTypeParser** attribute to your functions. These functions must have the following signature: `public static bool ParseFunction( string input, out object output );`
+
+```csharp
+using UnityEngine;
+using IngameDebugConsole;
+
+public class TestScript : MonoBehaviour
+{
+	[ConsoleCustomTypeParser( typeof( Person ) )]
+	public static bool ParsePerson( string input, out object output )
+	{
+		// Same as above...
+	}
+}
+```
+
+### Removing Supported Custom Parameter Types
+
+Use `DebugLogConsole.RemoveCustomParameterType( Type type )`.
